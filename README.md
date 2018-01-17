@@ -10,9 +10,10 @@
 ## 使用方法
 * `git clone https://github.com/hcnode/million-question`
 * `cd million-question && npm i`
-* 修改配置config.js，添加你的ocr相关key信息，CHANNEL是当前的答题app，当前支持“xigua”和“yy”
+* 修改配置config.js，添加你的ocr相关key信息，CHANNEL是当前的答题app，当前支持“xigua”和“yy”，配置adb命令位置ADB_COMMAND
 * 连接好andriod设备，并打开CHANNEL配置的视频
 * `node app`
+* 访问http://localhost:3000
 * 程序会不停获取当前截图，并识别是否为答题状态中，如果是，识别出问题和答案，并推送给所有连接的用户
 
 ## 相关技术说明
@@ -24,7 +25,7 @@
   // adb命令截图
   screencap: () => {
     return new Promise(resolve =>
-      shell.exec(`${__dirname}/../platform-tools/adb shell screencap -p /sdcard/screen.png`, { async: true }, resolve)
+      shell.exec(`${config.ADB_COMMAND} shell screencap -p /sdcard/screen.png`, { async: true }, resolve)
     );
   },
   // adb命令copy截图文件从手机到本地
@@ -34,7 +35,7 @@
     }
     var dest = `${__dirname}/../question/src.png`;
     await new Promise(resolve =>
-      shell.exec(`${__dirname}/../platform-tools/adb pull /sdcard/screen.png ${dest}`, { async: true }, resolve)
+      shell.exec(`${config.ADB_COMMAND} pull /sdcard/screen.png ${dest}`, { async: true }, resolve)
     );
     return dest;
   }
@@ -95,6 +96,7 @@ async function isQuestion(file) {
 ```
 
 #### 这时候通过调用百度的图片识别api获取问题和答案的文字
+[源码](https://github.com/hcnode/million-question/blob/master/src/ocr.js)
 
 #### 最后模拟http请求搜索问题和答案组合
 ```javascript
